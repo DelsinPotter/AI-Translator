@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "*")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 if not GEMINI_API_KEY or not ENCRYPTION_KEY:
     raise ValueError("Missing required environment variables")
