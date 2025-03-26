@@ -65,7 +65,7 @@ async def translate_and_speak(
         
         # Generate Audio
         tts = gTTS(translated_text, lang=output_lang_code)
-        temp_audio = tempfile.NamedTemporaryFile(delete=True, suffix=".mp3")
+        temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
         tts.save(temp_audio.name)
 
         # Encrypt Audio Data
