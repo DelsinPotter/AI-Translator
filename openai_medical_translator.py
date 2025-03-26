@@ -94,11 +94,21 @@ async def serve_audio(filename: str):
 
         # Decrypt the audio file
         decrypted_path = os.path.join(tempfile.gettempdir(), f"decrypted_{filename}")
+        
+        logging.info(f"Attempting to decrypt audio file: {file_path}")
+         # Check if the encrypted file exists
+        if not os.path.exists(file_path):
+            logging.error(f"Encrypted file not found: {file_path}")
+            return JSONResponse({"error": "Audio file not found"}, status_code=404)
+
+        
         with open(file_path, "rb") as file:
             encrypted_data = file.read()
         
         with open(decrypted_path, "wb") as file:
             file.write(cipher.decrypt(encrypted_data))  # Decrypt before sending
+            
+        logging.info(f"Decryption successful, serving audio: {decrypted_path}")
         
         print(f"Decrypted audio file path: {decrypted_path}")
 
