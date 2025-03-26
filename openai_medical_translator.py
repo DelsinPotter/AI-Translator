@@ -73,7 +73,6 @@ async def translate_and_speak(
                 encrypted_data = cipher.encrypt(file.read())
             with open(temp_audio.name, "wb") as file:
                 file.write(encrypted_data)
-        print(f"original_text {text},translated_text: {translated_text},  audio_file: {temp_audio.name} ")
         audio_filename = os.path.basename(temp_audio.name)  # Extract only the filename
 
         return JSONResponse({
@@ -95,7 +94,7 @@ async def serve_audio(filename: str):
         # Decrypt the audio file
         decrypted_path = os.path.join(tempfile.gettempdir(), f"decrypted_{filename}")
         
-        logging.info(f"Attempting to decrypt audio file: {file_path}")
+       
          # Check if the encrypted file exists
         if not os.path.exists(file_path):
             logging.error(f"Encrypted file not found: {file_path}")
@@ -108,7 +107,6 @@ async def serve_audio(filename: str):
         with open(decrypted_path, "wb") as file:
             file.write(cipher.decrypt(encrypted_data))  # Decrypt before sending
             
-        logging.info(f"Decryption successful, serving audio: {decrypted_path}")
         
         print(f"Decrypted audio file path: {decrypted_path}")
 
