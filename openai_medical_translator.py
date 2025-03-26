@@ -32,7 +32,6 @@ logging.basicConfig(
 )
 
 app = FastAPI()
-print(f"frontendurl= {FRONTEND_URL}")
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
