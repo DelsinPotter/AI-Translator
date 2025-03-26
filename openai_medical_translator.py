@@ -51,7 +51,13 @@ async def translate_and_speak(
     try:
         # Translate Text using Free Gemini Model
         model = genai.GenerativeModel("gemini-1.5-flash")
-        prompt = f"Translate the following text from {input_lang_code} to {output_lang_code} and do not add English transliteration: {text}"
+        prompt = (
+                f"You are a medical translation AI specializing in healthcare communication. "
+                f"Translate the following text from {input_lang_code} to {output_lang_code} with medical accuracy. "
+                f"Ensure correct usage of medical terminology and avoid adding English transliteration. "
+                f"Maintain the original meaning without altering critical medical details:\n\n"
+                f"Text: {text}"
+                )
         response = model.generate_content(prompt)
         translated_text = response.text.strip() if response.text else ""
         
