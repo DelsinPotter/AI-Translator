@@ -89,15 +89,22 @@ async def translate_and_speak(
 @app.get("/audio/{filename}")
 async def serve_audio(filename: str):
     try:
-        # Decrypt and serve audio file
-        decrypted_path = f"decrypted_{filename}"
-        file_path = os.path.join(tempfile.gettempdir(), filename)  # Locate the temp file
+        # Locate the encrypted audio file
+        file_path = os.path.join(tempfile.gettempdir(), filename)
+
+        # Decrypt the audio file
+        decrypted_path = os.path.join(tempfile.gettempdir(), f"decrypted_{filename}")
         with open(file_path, "rb") as file:
             encrypted_data = file.read()
+        
         with open(decrypted_path, "wb") as file:
-            file.write(cipher.decrypt(encrypted_data))
-        print(f"decrypted_path {decrypted_path}")
-        return FileResponse(decrypted_path, media_type="audio/mp3")
+            file.write(cipher.decrypt(encrypted_data))  # Decrypt before sending
+        
+        print(f"Decrypted audio file path: {decrypted_path}")
+
+        return FileResponse(decrypted_path, media_type="audio/mpeg")
+
     except Exception as e:
         logging.error(f"Error decrypting audio: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)
+
