@@ -63,31 +63,41 @@ async def translate_and_speak(
         if not translated_text:
             raise HTTPException(status_code=500, detail="Translation failed.")
         
-        # Generate Audio
+       # Generate Audio
         tts = gTTS(translated_text, lang=output_lang_code)
-        temp_audio = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-        tts.save(temp_audio.name)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+            tts.save(temp_audio.name)
 
-        # Encrypt Audio Data
-        with open(temp_audio.name, "rb") as file:
-            encrypted_data = cipher.encrypt(file.read())
-        
+            # Encrypt the file
+            with open(temp_audio.name, "rb") as file:
+                encrypted_data = cipher.encrypt(file.read())
+            with open(temp_audio.name, "wb") as file:
+                file.write(encrypted_data)
+        print(f"original_text {text},translated_text: {translated_text},  audio_file: {temp_audio.name} ")
+        audio_filename = os.path.basename(temp_audio.name)  # Extract only the filename
+
         return JSONResponse({
             "original_text": text,
             "translated_text": translated_text,
-            "audio_data": encrypted_data.decode()  # Send encrypted data directly
+            "audio_file": audio_filename  # Return only filename, not full path
         })
+
     except Exception as e:
         logging.error(f"Error during translation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/audio/play")
-async def serve_audio(encrypted_audio: str):
+@app.get("/audio/{filename}")
+async def serve_audio(filename: str):
     try:
-        decrypted_data = cipher.decrypt(encrypted_audio.encode())
-        return StreamingResponse(
-            iter([decrypted_data]), media_type="audio/mp3"
-        )
+        # Decrypt and serve audio file
+        decrypted_path = f"decrypted_{filename}"
+        file_path = os.path.join(tempfile.gettempdir(), filename)  # Locate the temp file
+        with open(file_path, "rb") as file:
+            encrypted_data = file.read()
+        with open(decrypted_path, "wb") as file:
+            file.write(cipher.decrypt(encrypted_data))
+        print(f"decrypted_path {decrypted_path}")
+        return FileResponse(decrypted_path, media_type="audio/mp3")
     except Exception as e:
         logging.error(f"Error decrypting audio: {e}")
-        raise HTTPException(status_code=500, detail="Error decrypting audio")
+        return JSONResponse({"error": str(e)}, status_code=500)
