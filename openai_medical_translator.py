@@ -115,8 +115,4 @@ async def serve_audio(filename: str):
     except Exception as e:
         logging.error(f"Error decrypting audio: {e}")
         return JSONResponse({"error": str(e)}, status_code=500)
-    finally:
-        # Ensure the file gets deleted after serving
-        if os.path.exists(decrypted_path):
-            os.remove(decrypted_path)
-            logging.info(f"Deleted decrypted file: {decrypted_path}")
+    
