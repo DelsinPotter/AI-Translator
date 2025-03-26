@@ -59,6 +59,12 @@ async def translate_and_speak(
                 )
         response = model.generate_content(prompt)
         translated_text = response.text.strip() if response.text else ""
+        prompt = (
+                f"Text: {text}"
+                f"return the medical terms from this text:{text}"
+                )
+        response = model.generate_content(prompt)
+        medical_terms = response.text.strip() if response.text else ""
         
         if not translated_text:
             raise HTTPException(status_code=500, detail="Translation failed.")
@@ -78,7 +84,9 @@ async def translate_and_speak(
         return JSONResponse({
             "original_text": text,
             "translated_text": translated_text,
-            "audio_file": audio_filename  # Return only filename, not full path
+            "audio_file": audio_filename 
+            "medical_terms": medical_terms
+            # Return only filename, not full path
         })
 
     except Exception as e:
