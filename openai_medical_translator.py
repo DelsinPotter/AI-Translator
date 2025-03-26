@@ -102,7 +102,7 @@ async def serve_audio(filename: str):
         
         print(f"Decrypted audio file path: {decrypted_path}")
 
-        return FileResponse(decrypted_path, media_type="audio/mpeg")
+        return FileResponse(decrypted_path, media_type="audio/mp3")
 
     except Exception as e:
         logging.error(f"Error decrypting audio: {e}")
